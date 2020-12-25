@@ -58,6 +58,7 @@ public class MyFutoshikiGame extends javax.swing.JFrame {
         solutionBtn = new javax.swing.JButton();
         calculLbl = new javax.swing.JLabel();
         diffCB = new javax.swing.JComboBox<>();
+        enableMVR = new javax.swing.JCheckBox();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -95,6 +96,8 @@ public class MyFutoshikiGame extends javax.swing.JFrame {
         diffCB.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Facile", "Difficile" }));
         diffCB.setToolTipText("");
 
+        enableMVR.setText("MVR");
+
         javax.swing.GroupLayout contentPaneLayout = new javax.swing.GroupLayout(contentPane);
         contentPane.setLayout(contentPaneLayout);
         contentPaneLayout.setHorizontalGroup(
@@ -103,17 +106,21 @@ public class MyFutoshikiGame extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(contentPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(contentPaneLayout.createSequentialGroup()
-                        .addComponent(dimensionGameCB, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(11, 11, 11)
-                        .addComponent(diffCB, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(contentPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(contentPaneLayout.createSequentialGroup()
+                                .addComponent(dimensionGameCB, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(11, 11, 11)
+                                .addComponent(diffCB, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(Choose))
+                            .addComponent(grille, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 87, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, contentPaneLayout.createSequentialGroup()
+                        .addComponent(enableMVR)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(Choose))
-                    .addComponent(grille, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(92, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, contentPaneLayout.createSequentialGroup()
-                .addComponent(solutionBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(calculLbl, javax.swing.GroupLayout.PREFERRED_SIZE, 289, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(solutionBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(calculLbl, javax.swing.GroupLayout.PREFERRED_SIZE, 289, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         contentPaneLayout.setVerticalGroup(
@@ -128,9 +135,12 @@ public class MyFutoshikiGame extends javax.swing.JFrame {
                 .addComponent(grille, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
                 .addGroup(contentPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(calculLbl, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(solutionBtn))
-                .addContainerGap())
+                    .addGroup(contentPaneLayout.createSequentialGroup()
+                        .addComponent(calculLbl, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap())
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, contentPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(solutionBtn)
+                        .addComponent(enableMVR))))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -292,7 +302,7 @@ public class MyFutoshikiGame extends javax.swing.JFrame {
             Backtracking backtracking = new Backtracking(this);
 
             long start = System.currentTimeMillis();
-            ST<String, String> result = backtracking.backtracking(config, domainTable, G);
+            ST<String, String> result = backtracking.backtracking(config, domainTable, G, this.enableMVR.isSelected());
             long duration = System.currentTimeMillis() - start;
 
             for (int i = 0; i < dimension; i++) {
@@ -705,6 +715,7 @@ public class MyFutoshikiGame extends javax.swing.JFrame {
     private javax.swing.JPanel contentPane;
     private javax.swing.JComboBox<String> diffCB;
     private javax.swing.JComboBox<String> dimensionGameCB;
+    private javax.swing.JCheckBox enableMVR;
     private javax.swing.JPanel grille;
     private javax.swing.JButton solutionBtn;
     // End of variables declaration//GEN-END:variables
