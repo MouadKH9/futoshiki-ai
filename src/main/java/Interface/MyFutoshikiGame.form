@@ -44,25 +44,32 @@
                       <Group type="102" alignment="0" attributes="0">
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Group type="102" alignment="0" attributes="0">
-                                  <Component id="dimensionGameCB" min="-2" pref="105" max="-2" attributes="0"/>
-                                  <EmptySpace min="-2" pref="11" max="-2" attributes="0"/>
-                                  <Component id="diffCB" min="-2" pref="105" max="-2" attributes="0"/>
+                                  <Component id="enableMVR" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="Choose" min="-2" max="-2" attributes="0"/>
+                                  <Component id="enableForwardChecking" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                  <Component id="solutionBtn" min="-2" pref="81" max="-2" attributes="0"/>
+                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                  <Component id="calculLbl" max="32767" attributes="0"/>
                               </Group>
-                              <Component id="grille" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Group type="102" attributes="0">
+                                  <Component id="grille" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                              </Group>
                           </Group>
-                          <EmptySpace min="0" pref="87" max="32767" attributes="0"/>
-                      </Group>
-                      <Group type="102" alignment="1" attributes="0">
-                          <Component id="enableMVR" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="solutionBtn" min="-2" pref="81" max="-2" attributes="0"/>
-                          <EmptySpace max="32767" attributes="0"/>
-                          <Component id="calculLbl" min="-2" pref="289" max="-2" attributes="0"/>
+                      </Group>
+                      <Group type="102" alignment="0" attributes="0">
+                          <Component id="dimensionGameCB" min="-2" pref="105" max="-2" attributes="0"/>
+                          <EmptySpace min="-2" pref="11" max="-2" attributes="0"/>
+                          <Component id="diffCB" min="-2" pref="105" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="Choose" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace type="separate" max="-2" attributes="0"/>
+                          <Component id="helpLabel" pref="274" max="32767" attributes="0"/>
+                          <EmptySpace min="-2" pref="15" max="-2" attributes="0"/>
                       </Group>
                   </Group>
-                  <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -74,6 +81,7 @@
                       <Component id="dimensionGameCB" alignment="3" min="-2" pref="29" max="-2" attributes="0"/>
                       <Component id="Choose" alignment="3" max="32767" attributes="0"/>
                       <Component id="diffCB" alignment="3" min="-2" pref="29" max="-2" attributes="0"/>
+                      <Component id="helpLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Component id="grille" max="32767" attributes="0"/>
@@ -86,6 +94,7 @@
                       <Group type="103" alignment="1" groupAlignment="3" attributes="0">
                           <Component id="solutionBtn" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="enableMVR" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="enableForwardChecking" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                   </Group>
               </Group>
@@ -162,6 +171,20 @@
         <Component class="javax.swing.JCheckBox" name="enableMVR">
           <Properties>
             <Property name="text" type="java.lang.String" value="MVR"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JCheckBox" name="enableForwardChecking">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Forward Checking"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="enableForwardCheckingActionPerformed"/>
+          </Events>
+        </Component>
+        <Component class="javax.swing.JLabel" name="helpLabel">
+          <Properties>
+            <Property name="horizontalAlignment" type="int" value="11"/>
+            <Property name="text" type="java.lang.String" value="Appuyez sur entr&#xe9; pour obtenir un indice"/>
           </Properties>
         </Component>
       </SubComponents>

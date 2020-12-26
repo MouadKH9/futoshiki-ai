@@ -3,9 +3,12 @@ package Interface;
 import Metier.*;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -24,20 +27,20 @@ public class MyFutoshikiGame extends javax.swing.JFrame {
     private char[][] contraintesHoriz; // Grille des contraintes horizontales : < et >
     private char[][] contraintesVert; // Grille des contraintes verticales : ^ et v
     private Graph G; // Le graphe du jeu 
-    private String configPath = "/Users/macbookpro/Documents/futo_configs/"; // Le repertoire des configurations
-
+    private ST<String, String> solution;
+    
     public MyFutoshikiGame() {
         initComponents();
     }
-
+    
     public int[][] getValGrille() {
         return this.valGrille;
     }
-
+    
     public char[][] getContraintesHoriz() {
         return this.contraintesHoriz;
     }
-
+    
     public char[][] getContraintesVert() {
         return this.contraintesVert;
     }
@@ -59,6 +62,8 @@ public class MyFutoshikiGame extends javax.swing.JFrame {
         calculLbl = new javax.swing.JLabel();
         diffCB = new javax.swing.JComboBox<>();
         enableMVR = new javax.swing.JCheckBox();
+        enableForwardChecking = new javax.swing.JCheckBox();
+        helpLabel = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -98,6 +103,16 @@ public class MyFutoshikiGame extends javax.swing.JFrame {
 
         enableMVR.setText("MVR");
 
+        enableForwardChecking.setText("Forward Checking");
+        enableForwardChecking.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                enableForwardCheckingActionPerformed(evt);
+            }
+        });
+
+        helpLabel.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+        helpLabel.setText("Appuyez sur entré pour obtenir un indice");
+
         javax.swing.GroupLayout contentPaneLayout = new javax.swing.GroupLayout(contentPane);
         contentPane.setLayout(contentPaneLayout);
         contentPaneLayout.setHorizontalGroup(
@@ -108,20 +123,26 @@ public class MyFutoshikiGame extends javax.swing.JFrame {
                     .addGroup(contentPaneLayout.createSequentialGroup()
                         .addGroup(contentPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(contentPaneLayout.createSequentialGroup()
-                                .addComponent(dimensionGameCB, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(11, 11, 11)
-                                .addComponent(diffCB, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(enableMVR)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(Choose))
-                            .addComponent(grille, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 87, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, contentPaneLayout.createSequentialGroup()
-                        .addComponent(enableMVR)
+                                .addComponent(enableForwardChecking)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(solutionBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(calculLbl, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addGroup(contentPaneLayout.createSequentialGroup()
+                                .addComponent(grille, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, Short.MAX_VALUE)))
+                        .addContainerGap())
+                    .addGroup(contentPaneLayout.createSequentialGroup()
+                        .addComponent(dimensionGameCB, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(11, 11, 11)
+                        .addComponent(diffCB, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(solutionBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(calculLbl, javax.swing.GroupLayout.PREFERRED_SIZE, 289, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap())
+                        .addComponent(Choose)
+                        .addGap(18, 18, 18)
+                        .addComponent(helpLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 274, Short.MAX_VALUE)
+                        .addGap(15, 15, 15))))
         );
         contentPaneLayout.setVerticalGroup(
             contentPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -130,7 +151,8 @@ public class MyFutoshikiGame extends javax.swing.JFrame {
                 .addGroup(contentPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(dimensionGameCB, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(Choose, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(diffCB, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(diffCB, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(helpLabel))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(grille, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
@@ -140,7 +162,8 @@ public class MyFutoshikiGame extends javax.swing.JFrame {
                         .addContainerGap())
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, contentPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(solutionBtn)
-                        .addComponent(enableMVR))))
+                        .addComponent(enableMVR)
+                        .addComponent(enableForwardChecking))))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -158,178 +181,34 @@ public class MyFutoshikiGame extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void solutionBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_solutionBtnActionPerformed
-        G = new Graph();
-        // --- On appelle la fonction de récupération des éléments de la grille ---
-        if (setElements(maGrille)) {
-            // --- Contraintes des lignes ---
-            for (int i = 0; i < dimension; i++) // Ligne
-            {
-                for (int j = 0; j < dimension - 1; j++) // Colonne
-                {
-                    for (int k = j + 1; k < dimension; k++) {
-                        //System.out.println("i = " + i + ", j = " + j + ", k = " + k);
-                        String val1 = "x" + i + "" + j;//String.valueOf(valGrille[i][j]);
-                        String val2 = "x" + i + "" + k;//String.valueOf(valGrille[i][k]);
-                        G.addEdge(val1, val2);
-                    }
+        long start = System.currentTimeMillis();
+        ST<String, String> config = this.getSolution();
+        this.solution = config;
+        long duration = System.currentTimeMillis() - start;
+        
+        for (int i = 0; i < dimension; i++) {
+            for (int j = 0; j < dimension; j++) {
+                if (i % 2 == 0 && j % 2 == 0) {
+                    //System.out.println("2 pairs : i = " + i + " et j = " + j + "\n ---- val = " + config.get("x"+i+""+j));
+                    maGrille[i * 2][j * 2].setText(config.get("x" + j + "" + i));
+                    maGrille[i * 2][j * 2].setEditable(false);
+                } else if (i % 2 == 0 && j % 2 != 0) {
+                    //System.out.println("1 pair, 1 impair : i = " + i + " et j = " + j + "\n ---- val = " + config.get("x"+i+""+j));
+                    maGrille[i * 2][j * 2].setText(config.get("x" + j + "" + i));
+                    maGrille[i * 2][j * 2].setEditable(false);
+                } else if (i % 2 != 0 && j % 2 == 0) {
+                    //System.out.println("1 impair, 1 pair : i = " + i + " et j = " + j + "\n ---- val = " + config.get("x"+i+""+j));
+                    maGrille[i * 2][j * 2].setText(config.get("x" + j + "" + i));
+                    maGrille[i * 2][j * 2].setEditable(false);
+                } else if (i % 2 != 0 && j % 2 != 0) {
+                    maGrille[i * 2][j * 2].setText(config.get("x" + j + "" + i));
+                    maGrille[i * 2][j * 2].setEditable(false);
                 }
+                System.out.print(i + "," + j + ": " + config.get("x" + i + "" + j) + " | ");
             }
-            // --- Contraintes des colonnes ---
-            for (int i = 0; i < dimension; i++) { // Colonne
-                for (int j = 0; j < dimension; j++) { // Ligne
-                    for (int k = j + 1; k < dimension; k++) {
-                        //System.out.println("i = " + i + ", j = " + j + ", k = " + k);
-                        String val1 = "x" + j + "" + i;//String.valueOf(valGrille[j][i]);
-                        String val2 = "x" + k + "" + i;//String.valueOf(valGrille[k][i]);
-                        G.addEdge(val2, val1);
-                    }
-
-                    if (i > 0 && (contraintesVert[i - 1][j] == '^' || contraintesVert[i - 1][j] == 'v')) {
-                        System.out.println("Found contraites vert1 at " + i + "," + j + " = " + contraintesVert[i - 1][j]);
-
-                        boolean cond = contraintesVert[i - 1][j] != '^';
-
-                        String val1 = cond ? "s" + j + "" + (i - 1) : "s" + j + "" + i;
-                        String val2 = cond ? "x" + j + "" + i : "x" + j + "" + (i - 1);
-
-                        G.addEdge(val2, val1);
-
-                        val1 = val1.replace("s", "x");
-                        val2 = val2.replace("x", "i");
-
-                        G.addEdge(val1, val2);
-
-                    }
-
-                    if (i < dimension - 1 && (contraintesVert[i][j] == '^' || contraintesVert[i][j] == 'v')) {
-                        System.out.println("Found contraites vert2 at " + i + "," + j + " = " + contraintesVert[i][j]);
-
-                        boolean cond = contraintesVert[i][j] != '^';
-
-                        String val1 = cond ? "s" + j + "" + i : "s" + j + "" + (i + 1);
-                        String val2 = cond ? "x" + j + "" + (i + 1) : "x" + j + "" + i;
-
-                        G.addEdge(val2, val1);
-
-                        val1 = val1.replace("s", "x");
-                        val2 = val2.replace("x", "i");
-
-                        G.addEdge(val1, val2);
-                    }
-
-                    if (j < dimension - 1 && (contraintesHoriz[i][j] == '<' || contraintesHoriz[i][j] == '>')) {
-                        System.out.println("Found contraites at " + i + "," + j + " = " + contraintesHoriz[i][j]);
-
-                        boolean cond = contraintesHoriz[i][j] == '<';
-
-                        String val1 = cond ? "s" + (j + 1) + "" + i : "s" + j + "" + i;
-                        String val2 = cond ? "x" + j + "" + i : "x" + (j + 1) + "" + i;
-
-                        G.addEdge(val2, val1);
-
-                        val1 = val1.replace("s", "x");
-                        val2 = val2.replace("x", "i");
-
-                        G.addEdge(val1, val2);
-                    }
-
-                    if (j > 0 && (contraintesHoriz[i][j - 1] == '<' || contraintesHoriz[i][j - 1] == '>')) {
-                        System.out.println("Found horiz contraites at " + i + "," + j + " = " + contraintesHoriz[i][j - 1]);
-
-                        boolean cond = contraintesHoriz[i][j - 1] == '<';
-
-                        String val1 = cond ? "s" + j + "" + i : "s" + (j - 1) + "" + i;
-                        String val2 = cond ? "x" + (j - 1) + "" + i : "x" + j + "" + i;
-
-                        G.addEdge(val2, val1);
-
-                        val1 = val1.replace("s", "x");
-                        val2 = val2.replace("x", "i");
-
-                        G.addEdge(val1, val2);
-                    }
-                }
-            }
-
-            // --- Table des domaines ---
-            ST<String, SET<String>> domainTable = new ST<String, SET<String>>();
-            // --- Remplissage des domaines ---
-            Object[][] domains = new Object[dimension][dimension];
-            // --- Initialisation des domaines ---
-            for (int i = 0; i < dimension; i++) // Colonne
-            {
-                for (int j = 0; j < dimension; j++) // Ligne
-                {
-                    domains[i][j] = new SET<String>();
-                }
-            }
-            // --- Attribuer les domaines aux valeurs de la grille (1) : sans considérer les contraintes de signes ---
-            for (int i = 0; i < dimension; i++) // Colonne
-            {
-                for (int j = 0; j < dimension; j++) // Ligne
-                {
-                    if (valGrille[i][j] != 0) {
-                        ((SET<String>) domains[i][j]).add(new String(String.valueOf(valGrille[i][j]))); // Domaine avec une seule valeur (case remplie)
-                    } else {
-                        for (int k = 1; k <= dimension; k++) {
-                            ((SET<String>) domains[i][j]).add("" + k);
-                        }
-                    }
-                }
-            }
-            // --- Ajout des domaines à la table ---
-            for (int i = 0; i < dimension; i++) {
-                for (int j = 0; j < dimension; j++) {
-                    domainTable.put("x" + j + "" + i, ((SET<String>) domains[i][j]));
-                }
-            }
-            // --- Affichage des domaines de chaque cellule ---
-            System.out.println("\nLa table des domaines est : ");
-            Set<String> keys = (Set<String>) domainTable.getST().keySet();
-            for (String key : keys) {
-                System.out.println("Le domaine de " + key + " est: " + domainTable.getST().get(key));
-            }
-            // --- Configuration initiale ---
-            ST<String, String> config = new ST<String, String>();
-            for (int i = 0; i < dimension; i++) {
-                for (int j = 0; j < dimension; j++) {
-                    config.put("x" + i + "" + j, "");
-                }
-            }
-
-            calculLbl.setText("Calcul de la solution en cours ...");
-
-            Backtracking backtracking = new Backtracking(this);
-
-            long start = System.currentTimeMillis();
-            ST<String, String> result = backtracking.backtracking(config, domainTable, G, this.enableMVR.isSelected());
-            long duration = System.currentTimeMillis() - start;
-
-            for (int i = 0; i < dimension; i++) {
-                for (int j = 0; j < dimension; j++) {
-                    if (i % 2 == 0 && j % 2 == 0) {
-                        //System.out.println("2 pairs : i = " + i + " et j = " + j + "\n ---- val = " + config.get("x"+i+""+j));
-                        maGrille[i * 2][j * 2].setText(config.get("x" + j + "" + i));
-                        maGrille[i * 2][j * 2].setEditable(false);
-                    } else if (i % 2 == 0 && j % 2 != 0) {
-                        //System.out.println("1 pair, 1 impair : i = " + i + " et j = " + j + "\n ---- val = " + config.get("x"+i+""+j));
-                        maGrille[i * 2][j * 2].setText(config.get("x" + j + "" + i));
-                        maGrille[i * 2][j * 2].setEditable(false);
-                    } else if (i % 2 != 0 && j % 2 == 0) {
-                        //System.out.println("1 impair, 1 pair : i = " + i + " et j = " + j + "\n ---- val = " + config.get("x"+i+""+j));
-                        maGrille[i * 2][j * 2].setText(config.get("x" + j + "" + i));
-                        maGrille[i * 2][j * 2].setEditable(false);
-                    } else if (i % 2 != 0 && j % 2 != 0) {
-                        maGrille[i * 2][j * 2].setText(config.get("x" + j + "" + i));
-                        maGrille[i * 2][j * 2].setEditable(false);
-                    }
-                    System.out.print(i + "," + j + ": " + config.get("x" + i + "" + j) + " | ");
-                }
-            }
-            grille.repaint();
-            calculLbl.setText("Terminé: " + duration + "ms");
-        } else
-            System.out.println("Erreur lors de la récupération des éléments de la grille !");
+        }
+        grille.repaint();
+        calculLbl.setText("Terminé: " + duration + "ms");
     }//GEN-LAST:event_solutionBtnActionPerformed
 
     private void ChooseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ChooseActionPerformed
@@ -338,51 +217,51 @@ public class MyFutoshikiGame extends javax.swing.JFrame {
         dimension = indexDimension + 4;
         dimGrille = 2 * dimension - 1;
         maGrille = new JTextField[dimGrille][dimGrille];
-
+        
         grille.removeAll();
         grille.repaint();
-
+        
         grille.setBounds(grille.getX(), grille.getY(), 75 * dimension, 75 * dimension);
-
+        
+        this.solution = null;
+        
         for (int i = 0; i < dimGrille; i++) {
             for (int j = 0; j < dimGrille; j++) {
                 maGrille[i][j] = new JTextField();
                 maGrille[i][j].setHorizontalAlignment(JTextField.CENTER);
-                maGrille[i][j].getDocument().addDocumentListener(new DocumentListener() {
-                    public void changedUpdate(DocumentEvent e) {
-                        try {
-                            checkIfDone(e.getDocument().getText(0, e.getDocument().getLength()));
-                        } catch (BadLocationException ex) {
-                            Logger.getLogger(MyFutoshikiGame.class.getName()).log(Level.SEVERE, null, ex);
-                        }
+                final int ii = i;
+                final int jj = j;
+                maGrille[i][j].addKeyListener(new KeyListener() {
+                    public void keyPressed(KeyEvent keyEvent) {
+                        checkForHelp(keyEvent);
+                        checkIfDone();
                     }
-
-                    public void removeUpdate(DocumentEvent e) {
-                        try {
-                            checkIfDone(e.getDocument().getText(0, e.getDocument().getLength()));
-                        } catch (BadLocationException ex) {
-                            Logger.getLogger(MyFutoshikiGame.class.getName()).log(Level.SEVERE, null, ex);
-                        }
+                    
+                    public void keyReleased(KeyEvent keyEvent) {
+                        checkForHelp(keyEvent);
+                        checkIfDone();
                     }
-
-                    public void insertUpdate(DocumentEvent e) {
-                        try {
-                            checkIfDone(e.getDocument().getText(0, e.getDocument().getLength()));
-                        } catch (BadLocationException ex) {
-                            Logger.getLogger(MyFutoshikiGame.class.getName()).log(Level.SEVERE, null, ex);
-                        }
+                    
+                    public void keyTyped(KeyEvent keyEvent) {
+                        checkForHelp(keyEvent);
+                        checkIfDone();
                     }
-
-                    public void checkIfDone(String text) {
+                    
+                    private void checkForHelp(KeyEvent keyEvent){
+                        if(keyEvent.getKeyCode() == KeyEvent.VK_ENTER)
+                            getHint(ii,jj);
+                    }
+                    
+                    private void checkIfDone() {
                         setElements(maGrille);
                         for (int i = 0; i < dimension; i++) {
                             for (int j = 0; j < dimension; j++) {
                                 int val = valGrille[i][j];
-                                System.out.println("Checking if done " + val);
-                                if(val == 0) return;
+                                if (val == 0) {
+                                    return;
+                                }
                             }
                         }
-                        System.out.println("Done!");
                         verifyContraintes();
                     }
                 });
@@ -405,6 +284,10 @@ public class MyFutoshikiGame extends javax.swing.JFrame {
         // Remplissage des contraintes
         this.generateBoard(indexDiff == 0 ? "easy" : "hard", dimension);
     }//GEN-LAST:event_ChooseActionPerformed
+
+    private void enableForwardCheckingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_enableForwardCheckingActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_enableForwardCheckingActionPerformed
     // --- Méthode de récupération des valeurs et contraintes de la grille ---
 
     public boolean setElements(JTextField[][] grille) {
@@ -661,16 +544,17 @@ public class MyFutoshikiGame extends javax.swing.JFrame {
             }
         });
     }
-
+    
     private JTextField createField(JTextField textField, String value) {
         textField.setText(value);
         textField.setEditable(false);
         textField.setForeground(Color.GRAY);
         return textField;
     }
-
+    
     private void generateBoard(String diff, int dim) {
         try {
+            this.solution = null;
             BufferedReader csvReader = new BufferedReader(new FileReader(new File("src/main/resources/config_" + dim + "_" + diff + ".csv")));
             String row;
             while ((row = csvReader.readLine()) != null) {
@@ -678,35 +562,194 @@ public class MyFutoshikiGame extends javax.swing.JFrame {
                 String[] data = row.split(",");
                 int i = Integer.parseInt(data[0]);
                 int j = Integer.parseInt(data[1]);
-
+                
                 System.out.println("Adding field " + i + " " + j + " " + data[2]);
-
+                
                 this.maGrille[i][j] = this.createField(maGrille[i][j], data[2]);
-
+                
                 solutionBtn.setEnabled(true);
             }
             csvReader.close();
-        } catch (Exception e) {
+        } catch (IOException | NumberFormatException e) {
             e.printStackTrace();
         }
     }
-
+    
     private void showMessage(String message) {
         this.calculLbl.setText(message);
     }
-
+    
     private void highlightError(int i, int j) {
         i = i * 2;
         j = j * 2;
         this.maGrille[i][j].setForeground(Color.red);
     }
     
-    public void resetHighlight(){
+    private void resetHighlight() {
         for (int i = 0; i < maGrille.length; i++) {
             for (int j = 0; j < maGrille[0].length; j++) {
                 maGrille[i][j].setForeground(Color.BLACK);
             }
         }
+    }
+    
+    private ST<String, String> getSolution() {
+        G = new Graph();
+        // --- On appelle la fonction de récupération des éléments de la grille ---
+        if (!setElements(maGrille)) {
+            System.out.println("Erreur lors de la récupération des éléments de la grille !");
+            return null;
+        }
+        // --- Contraintes des lignes ---
+        for (int i = 0; i < dimension; i++) // Ligne
+        {
+            for (int j = 0; j < dimension - 1; j++) // Colonne
+            {
+                for (int k = j + 1; k < dimension; k++) {
+                    //System.out.println("i = " + i + ", j = " + j + ", k = " + k);
+                    String val1 = "x" + i + "" + j;//String.valueOf(valGrille[i][j]);
+                    String val2 = "x" + i + "" + k;//String.valueOf(valGrille[i][k]);
+                    G.addEdge(val1, val2);
+                }
+            }
+        }
+        // --- Contraintes des colonnes ---
+        for (int i = 0; i < dimension; i++) { // Colonne
+            for (int j = 0; j < dimension; j++) { // Ligne
+                for (int k = j + 1; k < dimension; k++) {
+                    //System.out.println("i = " + i + ", j = " + j + ", k = " + k);
+                    String val1 = "x" + j + "" + i;//String.valueOf(valGrille[j][i]);
+                    String val2 = "x" + k + "" + i;//String.valueOf(valGrille[k][i]);
+                    G.addEdge(val2, val1);
+                }
+                
+                if (i > 0 && (contraintesVert[i - 1][j] == '^' || contraintesVert[i - 1][j] == 'v')) {
+                    System.out.println("Found contraites vert1 at " + i + "," + j + " = " + contraintesVert[i - 1][j]);
+                    
+                    boolean cond = contraintesVert[i - 1][j] != '^';
+                    
+                    String val1 = cond ? "s" + j + "" + (i - 1) : "s" + j + "" + i;
+                    String val2 = cond ? "x" + j + "" + i : "x" + j + "" + (i - 1);
+                    
+                    G.addEdge(val2, val1);
+                    
+                    val1 = val1.replace("s", "x");
+                    val2 = val2.replace("x", "i");
+                    
+                    G.addEdge(val1, val2);
+                    
+                }
+                
+                if (i < dimension - 1 && (contraintesVert[i][j] == '^' || contraintesVert[i][j] == 'v')) {
+                    System.out.println("Found contraites vert2 at " + i + "," + j + " = " + contraintesVert[i][j]);
+                    
+                    boolean cond = contraintesVert[i][j] != '^';
+                    
+                    String val1 = cond ? "s" + j + "" + i : "s" + j + "" + (i + 1);
+                    String val2 = cond ? "x" + j + "" + (i + 1) : "x" + j + "" + i;
+                    
+                    G.addEdge(val2, val1);
+                    
+                    val1 = val1.replace("s", "x");
+                    val2 = val2.replace("x", "i");
+                    
+                    G.addEdge(val1, val2);
+                }
+                
+                if (j < dimension - 1 && (contraintesHoriz[i][j] == '<' || contraintesHoriz[i][j] == '>')) {
+                    System.out.println("Found contraites at " + i + "," + j + " = " + contraintesHoriz[i][j]);
+                    
+                    boolean cond = contraintesHoriz[i][j] == '<';
+                    
+                    String val1 = cond ? "s" + (j + 1) + "" + i : "s" + j + "" + i;
+                    String val2 = cond ? "x" + j + "" + i : "x" + (j + 1) + "" + i;
+                    
+                    G.addEdge(val2, val1);
+                    
+                    val1 = val1.replace("s", "x");
+                    val2 = val2.replace("x", "i");
+                    
+                    G.addEdge(val1, val2);
+                }
+                
+                if (j > 0 && (contraintesHoriz[i][j - 1] == '<' || contraintesHoriz[i][j - 1] == '>')) {
+                    System.out.println("Found horiz contraites at " + i + "," + j + " = " + contraintesHoriz[i][j - 1]);
+                    
+                    boolean cond = contraintesHoriz[i][j - 1] == '<';
+                    
+                    String val1 = cond ? "s" + j + "" + i : "s" + (j - 1) + "" + i;
+                    String val2 = cond ? "x" + (j - 1) + "" + i : "x" + j + "" + i;
+                    
+                    G.addEdge(val2, val1);
+                    
+                    val1 = val1.replace("s", "x");
+                    val2 = val2.replace("x", "i");
+                    
+                    G.addEdge(val1, val2);
+                }
+            }
+        }
+
+        // --- Table des domaines ---
+        ST<String, SET<String>> domainTable = new ST<String, SET<String>>();
+        // --- Remplissage des domaines ---
+        Object[][] domains = new Object[dimension][dimension];
+        // --- Initialisation des domaines ---
+        for (int i = 0; i < dimension; i++) // Colonne
+        {
+            for (int j = 0; j < dimension; j++) // Ligne
+            {
+                domains[i][j] = new SET<String>();
+            }
+        }
+        // --- Attribuer les domaines aux valeurs de la grille (1) : sans considérer les contraintes de signes ---
+        for (int i = 0; i < dimension; i++) // Colonne
+        {
+            for (int j = 0; j < dimension; j++) // Ligne
+            {
+                if (valGrille[i][j] != 0) {
+                    ((SET<String>) domains[i][j]).add(new String(String.valueOf(valGrille[i][j]))); // Domaine avec une seule valeur (case remplie)
+                } else {
+                    for (int k = 1; k <= dimension; k++) {
+                        ((SET<String>) domains[i][j]).add("" + k);
+                    }
+                }
+            }
+        }
+        // --- Ajout des domaines à la table ---
+        for (int i = 0; i < dimension; i++) {
+            for (int j = 0; j < dimension; j++) {
+                domainTable.put("x" + j + "" + i, ((SET<String>) domains[i][j]));
+            }
+        }
+        // --- Affichage des domaines de chaque cellule ---
+        System.out.println("\nLa table des domaines est : ");
+        Set<String> keys = (Set<String>) domainTable.getST().keySet();
+        for (String key : keys) {
+            System.out.println("Le domaine de " + key + " est: " + domainTable.getST().get(key));
+        }
+        // --- Configuration initiale ---
+        ST<String, String> config = new ST<String, String>();
+        for (int i = 0; i < dimension; i++) {
+            for (int j = 0; j < dimension; j++) {
+                config.put("x" + i + "" + j, "");
+            }
+        }
+        
+        calculLbl.setText("Calcul de la solution en cours ...");
+        
+        Backtracking backtracking = new Backtracking(this);
+        
+        ST<String, String> result = backtracking.backtracking(config, domainTable, G, this.enableMVR.isSelected(), this.enableForwardChecking.isSelected());
+        return result;
+    }
+    
+    private void getHint(int i, int j){
+        System.out.println("Getting the hint");
+        if(this.solution == null)
+            this.solution = this.getSolution();
+        this.maGrille[i][j].setText(this.solution.get("x"+j/2+""+i/2));
+        System.out.println("Got it" + this.solution.get("x"+j/2+""+i/2));
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -715,8 +758,10 @@ public class MyFutoshikiGame extends javax.swing.JFrame {
     private javax.swing.JPanel contentPane;
     private javax.swing.JComboBox<String> diffCB;
     private javax.swing.JComboBox<String> dimensionGameCB;
+    private javax.swing.JCheckBox enableForwardChecking;
     private javax.swing.JCheckBox enableMVR;
     private javax.swing.JPanel grille;
+    private javax.swing.JLabel helpLabel;
     private javax.swing.JButton solutionBtn;
     // End of variables declaration//GEN-END:variables
 }
