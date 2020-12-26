@@ -10,24 +10,17 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.text.BadLocationException;
-
 public class MyFutoshikiGame extends javax.swing.JFrame {
 
-    // --- Les variables ---
-    private int dimension = 0; // Dimension choisie par le joueur (4, 5, 6, 7, 8, 9)
+    private int dimension = 0; // Dimension choisie par le joueur (4, 5, 6)
     private int dimGrille = 0; // Dimension de maGrille (= 2 * dimension - 1)
     private JTextField[][] maGrille; // La grille en totalité (valeurs et contraintes)
     private int[][] valGrille; // Les valeurs
     private char[][] contraintesHoriz; // Grille des contraintes horizontales : < et >
     private char[][] contraintesVert; // Grille des contraintes verticales : ^ et v
     private Graph G; // Le graphe du jeu 
-    private ST<String, String> solution;
+    private ST<String, String> solution; // Solution du board courante
     
     public MyFutoshikiGame() {
         initComponents();
@@ -189,22 +182,18 @@ public class MyFutoshikiGame extends javax.swing.JFrame {
         for (int i = 0; i < dimension; i++) {
             for (int j = 0; j < dimension; j++) {
                 if (i % 2 == 0 && j % 2 == 0) {
-                    //System.out.println("2 pairs : i = " + i + " et j = " + j + "\n ---- val = " + config.get("x"+i+""+j));
                     maGrille[i * 2][j * 2].setText(config.get("x" + j + "" + i));
                     maGrille[i * 2][j * 2].setEditable(false);
                 } else if (i % 2 == 0 && j % 2 != 0) {
-                    //System.out.println("1 pair, 1 impair : i = " + i + " et j = " + j + "\n ---- val = " + config.get("x"+i+""+j));
                     maGrille[i * 2][j * 2].setText(config.get("x" + j + "" + i));
                     maGrille[i * 2][j * 2].setEditable(false);
                 } else if (i % 2 != 0 && j % 2 == 0) {
-                    //System.out.println("1 impair, 1 pair : i = " + i + " et j = " + j + "\n ---- val = " + config.get("x"+i+""+j));
                     maGrille[i * 2][j * 2].setText(config.get("x" + j + "" + i));
                     maGrille[i * 2][j * 2].setEditable(false);
                 } else if (i % 2 != 0 && j % 2 != 0) {
                     maGrille[i * 2][j * 2].setText(config.get("x" + j + "" + i));
                     maGrille[i * 2][j * 2].setEditable(false);
                 }
-                System.out.print(i + "," + j + ": " + config.get("x" + i + "" + j) + " | ");
             }
         }
         grille.repaint();
@@ -302,39 +291,19 @@ public class MyFutoshikiGame extends javax.swing.JFrame {
                     if (i % 2 == 0 && j % 2 == 0) {
                         try {
                             int val = Integer.parseInt(grille[i][j].getText());
-                            /*if(val < 1 || val > dimension)
-                            {
-                                this.showMessage("La valeur " + val + " insérée dans la cellule [" + i + ", " + j + "] n'appartient pas au domaine des valeurs possibles !");
-                                return false;
-                            }*/
                             valGrille[i / 2][j / 2] = val;
                         } catch (NumberFormatException ex) {
-                            //this.showMessage("Vous devez saisir un nombre dans la cellule [" + i + "," + j + "] !");
                             ex.printStackTrace();
                             return false;
                         }
                     } // --- Les contraintes horizontales : < et > ---
                     else if (i % 2 == 0 && j % 2 != 0) {
                         char contrHoriz = grille[i][j].getText().charAt(0);
-                        /*if(!(contrHoriz == '<' || contrHoriz == '>'))
-                        {
-                            this.showMessage("Le signe insérée dans la cellule [" + (i+1) + ", " + (j+1) + "] n'est pas une contrainte (doit être '<' ou '>') !");
-                            return false;
-                        }*/
                         contraintesHoriz[i / 2][(j - 1) / 2] = contrHoriz;
                     } // ---- Les contraintes verticales : ^ et v ---
                     else if (i % 2 != 0 && j % 2 == 0) {
-//                        int v = ((i-2)/2);
-//                        int u = j/2;
-//                        System.out.println("i = " + v);
-//                        System.out.println("j = " + u);
-//                        System.out.println(i + ", " + j + " -> " + ((i-2)/2) + ", " + j/2 + " : Verticale trouvé : " + grille[i][j].getText().charAt(0));
                         char contrVert = grille[i][j].getText().charAt(0);
-                        /*if(!(contrVert == '^' || contrVert == 'v'))
-                        {
-                            this.showMessage("Le signe insérée dans la cellule [" + (i+1) + ", " + (j+1) + "] n'est pas une contrainte (doit être '^' ou 'v') !");
-                            return false;
-                        }*/
+                        
                         contraintesVert[(i - 1) / 2][j / 2] = contrVert;
                     }
                 }
@@ -562,9 +531,7 @@ public class MyFutoshikiGame extends javax.swing.JFrame {
                 String[] data = row.split(",");
                 int i = Integer.parseInt(data[0]);
                 int j = Integer.parseInt(data[1]);
-                
-                System.out.println("Adding field " + i + " " + j + " " + data[2]);
-                
+                                
                 this.maGrille[i][j] = this.createField(maGrille[i][j], data[2]);
                 
                 solutionBtn.setEnabled(true);
@@ -745,11 +712,10 @@ public class MyFutoshikiGame extends javax.swing.JFrame {
     }
     
     private void getHint(int i, int j){
-        System.out.println("Getting the hint");
         if(this.solution == null)
             this.solution = this.getSolution();
         this.maGrille[i][j].setText(this.solution.get("x"+j/2+""+i/2));
-        System.out.println("Got it" + this.solution.get("x"+j/2+""+i/2));
+        this.calculLbl.setText("");
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
