@@ -24,6 +24,7 @@ public class MyFutoshikiGame extends javax.swing.JFrame {
     
     public MyFutoshikiGame() {
         initComponents();
+        this.helpLabel.setVisible(false);
     }
     
     public int[][] getValGrille() {
@@ -524,6 +525,7 @@ public class MyFutoshikiGame extends javax.swing.JFrame {
     private void generateBoard(String diff, int dim) {
         try {
             this.solution = null;
+            this.helpLabel.setVisible(true);
             BufferedReader csvReader = new BufferedReader(new FileReader(new File("src/main/resources/config_" + dim + "_" + diff + ".csv")));
             String row;
             while ((row = csvReader.readLine()) != null) {
@@ -533,7 +535,6 @@ public class MyFutoshikiGame extends javax.swing.JFrame {
                 int j = Integer.parseInt(data[1]);
                                 
                 this.maGrille[i][j] = this.createField(maGrille[i][j], data[2]);
-                
                 solutionBtn.setEnabled(true);
             }
             csvReader.close();
@@ -712,6 +713,8 @@ public class MyFutoshikiGame extends javax.swing.JFrame {
     }
     
     private void getHint(int i, int j){
+        int input = JOptionPane.showConfirmDialog(null, "Vous êtes sûr de vouloir afficher un indice?");
+        if(input != 0) return;
         if(this.solution == null)
             this.solution = this.getSolution();
         this.maGrille[i][j].setText(this.solution.get("x"+j/2+""+i/2));
