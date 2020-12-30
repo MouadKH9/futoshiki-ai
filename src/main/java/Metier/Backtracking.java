@@ -8,12 +8,14 @@ package Metier;
 import Interface.MyFutoshikiGame;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.TreeMap;
+import java.util.List;
+import java.util.Map;
 import javax.swing.JTextField;
 
-/**
- *
- * @author Hafsa GH
- */
+
 public class Backtracking {
 
     static JTextField[][] maGrille;
@@ -38,11 +40,6 @@ public class Backtracking {
         }
         //get variable failed (all variables have been coloured)
         return null;
-    }
-
-    public static SET<String> orderDomainValue(String variable, ST<String, SET<String>> domain) {
-        //return the SET of domain values for the variable
-        return domain.get(variable);
     }
 
     public static boolean complete(ST<String, String> config) {
@@ -134,19 +131,15 @@ public class Backtracking {
 
     /*---------------------- Forward Checking ------------------------------*/
     public static void forwardChecking(String u, String variable, Graph g, ST<String, String> config, ST<String, SET<String>> domain) {
-        for (String adj : g.adjacentTo(variable)) {
-            if (config.get(adj) == null) {
-                continue;
-            }
-            if (config.get(adj).equalsIgnoreCase("")) {
-                SET<String> domaine = new SET<String>();
-                domaine = orderDomainValue(adj, domain);
-                if (domaine.contains(u)) {
-                    System.out.println("Removing " + u + " from " + adj);
-                    domain.get(adj).remove(u);
-                }
-            }
-        }
+        for(String adj: g.adjacentTo(variable))                       
+            if(config.get(adj)!=null && config.get(adj).equalsIgnoreCase("") && domain.get(adj).contains(u)) 
+                domain.get(adj).remove(u);
+    }
+    
+    public static SET<String> orderDomainValue2(String variable, ST<String, SET<String>> domain)
+    {
+        //return the SET of domain values for the variable
+        return domain.get(variable);
     }
 
     /*---------------------- Retour en arriere ------------------------------*/
@@ -157,7 +150,7 @@ public class Backtracking {
             if (config.get(adj) == null)
                 continue;
             if (config.get(adj).equalsIgnoreCase("")) {
-                domaine = orderDomainValue(adj, domain);
+                domaine = orderDomainValue2(adj, domain);
                 if (!domaine.contains(u)) {
                     domain.get(adj).add(u);
                 }
@@ -165,38 +158,208 @@ public class Backtracking {
         }
     }
 
-    public static ST<String, String> backtracking(ST<String, String> config, ST<String, SET<String>> domain, Graph g, boolean enableMVR, boolean enableForwardChecking) {
-        
+    public static void AC1(Graph g, ST<String, String> config, ST<String, SET<String>> domain) {
+        boolean changement;
+        do {
+            changement = false;
+            for (String variable : config) {
+                if (config.get(variable).equalsIgnoreCase("")) // Pour chaque variable non affectée    
+                {
+                    for (String adj : g.adjacentTo(variable)) {
+                        if (config.get(adj) != null && config.get(adj).equalsIgnoreCase("")) {   // ... adjacente non affectée                                
+                            // Pour éviter l'erreur : Exception in thread "main"                                  
+                            // java.util.ConcurrentModificationException                                 
+                            SET<String> valeurs = new SET<String>(domain.get(variable).getSet());
+                            for (String val : valeurs) {
+                                SET<String> adjDomain = domain.get(adj);
+                                // Valeur consistante introuvable                
+                                if ((adjDomain != null) && adjDomain.contains(val) && (adjDomain.size() == 1)) {
+                                    // Supprimer du domaine de la variable                                         
+                                    domain.get(variable).remove(val);
+                                    changement = true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } while (changement);
+    }
+    
+    public static String getVariableMRV(ST<String, SET<String>> domain , ST<String, String> config)
+    {
+        // Stocker (variable, taille du domaine)
+        TreeMap<String, Integer> compteParVariable = new TreeMap<>();
+        // Table associative triée par ordre croissant
+        for (String var : config)
+            if(config.get(var).equalsIgnoreCase(""))
+                compteParVariable.put(var,domain.get(var).size()) ;
+        // Mettre sous forme d'une liste puis trier
+        List list = new ArrayList(compteParVariable.entrySet());
+        Collections.sort(list, new cmpComptage());
+        return ((Map.Entry<String, Integer>)list.get(0)).getKey();
+     }    
+    
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public static String getVariableDegresMRV(Graph g, ST<String, SET<String>> domain, ST<String, String> config) {
+        // Stocker (variable, nombre de contraintes)
+        TreeMap<String, Integer> compteParVariable1 = new TreeMap<>();
+        // Stocker (variable, nombre de valeurs)
+        TreeMap<String, Integer> compteParVariable2 = new TreeMap<>();
+        // Table associative triée par ordre décroissant (à cause du - )
+        for (String var : config) {
+            if (config.get(var).equalsIgnoreCase("")) {
+                compteParVariable1.put(var, -g.degree(var));
+            }
+        }
+        // Mettre sous forme d'une liste puis trier
+        List list = new ArrayList(compteParVariable1.entrySet());
+        Collections.sort(list, new cmpComptage());
+        Integer compte0 = ((Map.Entry<String, Integer>) list.get(0)).getValue();
+        Iterator it = list.iterator();
+        // Garder les variables avec le nombre de degrés
+
+        while (it.hasNext()) {
+            Map.Entry entree = (Map.Entry) it.next();
+            if (((Integer) entree.getValue()).equals(compte0)) {
+                String var = (String) entree.getKey();
+                compteParVariable2.put(var, domain.get(var).size());
+            } else {
+                break;
+            }
+        }
+        list = new ArrayList(compteParVariable2.entrySet());
+        Collections.sort(list, new cmpComptage());
+
+        return ((Map.Entry<String, Integer>) list.get(0)).getKey();
+    }
+
+    public static List<String> orderDomainValue(String variable, ST<String, SET<String>> domain) {
+        List<String> valeurs = new ArrayList<>();
+
+        for (String val : domain.get(variable)) {
+            valeurs.add(val);
+        }
+
+        return valeurs;
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public static List<String> orderDomainValueLCV(String variable, Graph g, ST<String, SET<String>> domain) {
+        // Stocker (variable, nombre de contraintes)
+        TreeMap< String, Integer> compteParValeur = new TreeMap<>();
+        //return the SET of domain values for the variable
+        SET<String> vu = domain.get(variable);
+
+        for (String v : vu) {
+            int n = 1;
+            for (String adj : g.adjacentTo(variable)) {
+                if (domain.get(adj) != null && domain.get(adj).contains(v)) {
+                    n++;
+                }
+            }
+            compteParValeur.put(v, n);
+        }
+        // Mettre sous forme d'une liste puis trier
+        List list = new ArrayList(compteParValeur.entrySet());
+        Collections.sort(list, new Comparator<Map.Entry<String, Integer>>() {
+            @Override
+            public int compare(Map.Entry<String, Integer> e1, Map.Entry<String, Integer> e2) {
+                return e1.getValue().compareTo(e2.getValue());
+            }
+        });
+        // Liste des valeurs
+        List<String> vals = new ArrayList<>();
+        Iterator it = list.iterator();
+        while (it.hasNext()) {
+            Map.Entry<String, Integer> entree = (Map.Entry<String, Integer>) it.next();
+            vals.add((String) entree.getKey());
+        }
+        return vals;
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public static String getVariableDegres(Graph g, ST<String, String> config) {
+        // Stocker (variable, nombre de contraintes)
+        TreeMap<String, Integer> compteParVariable = new TreeMap<>();
+        // Table associative triée par ordre décroissant (à cause du - )
+        for (String var : config) {
+            if (config.get(var).equalsIgnoreCase("")) {
+                compteParVariable.put(var, -g.degree(var));
+            }
+        }
+        // Mettre sous forme d'une liste puis trier
+        List list = new ArrayList(compteParVariable.entrySet());
+        Collections.sort(list, new cmpComptage());
+
+        return ((Map.Entry<String, Integer>) list.get(0)).getKey();
+    }
+
+    public static ST<String, String> backtracking(ST<String, String> config, ST<String, SET<String>> domain,
+                                        Graph g, boolean enableMVR, boolean enableForwardChecking, 
+                                        boolean enableDegree, boolean enableLCV, boolean enableAC1) {
+
         // Arrêter s'il s'agit d'une affectation complete
-        if (complete(config))
+        if (complete(config)) {
             return config;
-            
+        }
+
         ST<String, String> result = null;
 
         // Variable à affecter
-        String v = enableMVR ? MVR(domain, config) : getVariable(config);
+        String v = null;
+        if(enableDegree && enableMVR)
+            v = getVariableDegresMRV(g, domain, config);
+        else if(enableMVR)
+            v = getVariableMRV(domain, config);
+        else 
+            v = enableDegree ? getVariableDegres(g, config) : getVariable(config);
 
         // Domaine de cette variable (liste des valeurs)
-        SET<String> vu = orderDomainValue(v, domain);
+        List<String> vu = enableLCV ? orderDomainValueLCV(v, g, domain) : orderDomainValue(v, domain);
+            
+        // Préparer la sauvegarde des domaines                
+        ST<String, SET<String>> tmpDomain = null;
         
         // Parcourir la liste des valeurs
         for (String u : vu) {
-            if (!consistent(u, v, config, g))
+            if (!consistent(u, v, config, g)) {
                 continue;
+            }
             
+            if(enableAC1){ 
+                tmpDomain = new ST<String, SET<String>>();
+                for(String vr: domain)                                
+                    tmpDomain.put(vr, new SET<>(domain.get(vr).getSet()));
+                
+                AC1(g,config,tmpDomain);  
+            }
+
             config.put(v, u);
-            if(enableForwardChecking)
+            if (enableForwardChecking) {
                 forwardChecking(u, v, g, config, domain);
+            }
             aff(config);
             valGrille[Character.getNumericValue(v.charAt(1))][Character.getNumericValue(v.charAt(2))] = Integer.parseInt(config.get(v));
-            result = backtracking(config, domain, g, enableMVR, enableForwardChecking);
+            result = backtracking(config, domain, g, enableMVR, enableForwardChecking,enableDegree, enableLCV, enableAC1);
             if (result != null) {
                 return result;
             }
-            if(enableForwardChecking)
+            if (enableForwardChecking) {
                 retour(u, v, g, config, domain);
+            }
             config.put(v, "");
         }
         return null;
+    }
+}
+
+class cmpComptage implements Comparator {
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public int compare(Object e1, Object e2) {
+        return ((Map.Entry<String, Integer>) e1).getValue().compareTo(((Map.Entry<String, Integer>) e2).getValue());
     }
 }

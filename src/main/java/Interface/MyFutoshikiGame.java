@@ -58,6 +58,9 @@ public class MyFutoshikiGame extends javax.swing.JFrame {
         enableMVR = new javax.swing.JCheckBox();
         enableForwardChecking = new javax.swing.JCheckBox();
         helpLabel = new javax.swing.JLabel();
+        enableAC1 = new javax.swing.JCheckBox();
+        enableLCV = new javax.swing.JCheckBox();
+        enableDegre = new javax.swing.JCheckBox();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -79,7 +82,7 @@ public class MyFutoshikiGame extends javax.swing.JFrame {
         );
         grilleLayout.setVerticalGroup(
             grilleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 503, Short.MAX_VALUE)
+            .addGap(0, 474, Short.MAX_VALUE)
         );
 
         solutionBtn.setText("Solution");
@@ -107,6 +110,29 @@ public class MyFutoshikiGame extends javax.swing.JFrame {
         helpLabel.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
         helpLabel.setText("Appuyez sur entré pour obtenir un indice");
 
+        enableAC1.setText("AC1");
+        enableAC1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                enableAC1ActionPerformed(evt);
+            }
+        });
+
+        enableLCV.setText("LCV");
+        enableLCV.setToolTipText("");
+        enableLCV.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                enableLCVActionPerformed(evt);
+            }
+        });
+
+        enableDegre.setText("Degree");
+        enableDegre.setToolTipText("");
+        enableDegre.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                enableDegreActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout contentPaneLayout = new javax.swing.GroupLayout(contentPane);
         contentPane.setLayout(contentPaneLayout);
         contentPaneLayout.setHorizontalGroup(
@@ -115,19 +141,8 @@ public class MyFutoshikiGame extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(contentPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(contentPaneLayout.createSequentialGroup()
-                        .addGroup(contentPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(contentPaneLayout.createSequentialGroup()
-                                .addComponent(enableMVR)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(enableForwardChecking)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(solutionBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(calculLbl, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                            .addGroup(contentPaneLayout.createSequentialGroup()
-                                .addComponent(grille, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(0, 0, Short.MAX_VALUE)))
-                        .addContainerGap())
+                        .addComponent(grille, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(contentPaneLayout.createSequentialGroup()
                         .addComponent(dimensionGameCB, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(11, 11, 11)
@@ -135,8 +150,26 @@ public class MyFutoshikiGame extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(Choose)
                         .addGap(18, 18, 18)
-                        .addComponent(helpLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 274, Short.MAX_VALUE)
-                        .addGap(15, 15, 15))))
+                        .addComponent(helpLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 279, Short.MAX_VALUE)
+                        .addGap(15, 15, 15))
+                    .addGroup(contentPaneLayout.createSequentialGroup()
+                        .addComponent(enableMVR)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(enableForwardChecking)
+                        .addGroup(contentPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(contentPaneLayout.createSequentialGroup()
+                                .addGap(105, 105, 105)
+                                .addComponent(calculLbl, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addGroup(contentPaneLayout.createSequentialGroup()
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(enableAC1)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(enableLCV)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(enableDegre)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(solutionBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap())))))
         );
         contentPaneLayout.setVerticalGroup(
             contentPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -153,11 +186,14 @@ public class MyFutoshikiGame extends javax.swing.JFrame {
                 .addGroup(contentPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(contentPaneLayout.createSequentialGroup()
                         .addComponent(calculLbl, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap())
+                        .addContainerGap(35, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, contentPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(solutionBtn)
                         .addComponent(enableMVR)
-                        .addComponent(enableForwardChecking))))
+                        .addComponent(enableForwardChecking)
+                        .addComponent(enableAC1)
+                        .addComponent(enableLCV)
+                        .addComponent(enableDegre)
+                        .addComponent(solutionBtn))))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -278,6 +314,18 @@ public class MyFutoshikiGame extends javax.swing.JFrame {
     private void enableForwardCheckingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_enableForwardCheckingActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_enableForwardCheckingActionPerformed
+
+    private void enableAC1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_enableAC1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_enableAC1ActionPerformed
+
+    private void enableLCVActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_enableLCVActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_enableLCVActionPerformed
+
+    private void enableDegreActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_enableDegreActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_enableDegreActionPerformed
     // --- Méthode de récupération des valeurs et contraintes de la grille ---
 
     public boolean setElements(JTextField[][] grille) {
@@ -708,7 +756,8 @@ public class MyFutoshikiGame extends javax.swing.JFrame {
         
         Backtracking backtracking = new Backtracking(this);
         
-        ST<String, String> result = backtracking.backtracking(config, domainTable, G, this.enableMVR.isSelected(), this.enableForwardChecking.isSelected());
+        ST<String, String> result = backtracking.backtracking(config, domainTable, G, this.enableMVR.isSelected(),
+                                        this.enableForwardChecking.isSelected(),this.enableDegre.isSelected(),this.enableLCV.isSelected(),this.enableAC1.isSelected());
         return result;
     }
     
@@ -727,7 +776,10 @@ public class MyFutoshikiGame extends javax.swing.JFrame {
     private javax.swing.JPanel contentPane;
     private javax.swing.JComboBox<String> diffCB;
     private javax.swing.JComboBox<String> dimensionGameCB;
+    private javax.swing.JCheckBox enableAC1;
+    private javax.swing.JCheckBox enableDegre;
     private javax.swing.JCheckBox enableForwardChecking;
+    private javax.swing.JCheckBox enableLCV;
     private javax.swing.JCheckBox enableMVR;
     private javax.swing.JPanel grille;
     private javax.swing.JLabel helpLabel;
